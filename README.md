@@ -101,6 +101,11 @@ char *encrypt_atbash(char *str)
 Jika file tersebut merupakan file hidden maka akan diexclude dan akan langsung direturn. Lalu ASCII code kapital dimulai dari 65 - 90, sedangkan untuk ASCII code huruf kecil dimulai dari 97 - 122. Kami melakukan exclude untuk yang tidak memenuhi ASCII code yang telah dilakukan. Lalu kami akan mengurangi nya dengan ` output[i] = 'Z' + 'A' - str[i];` ` // 65 + 90 - 65 = 90 rubah ke belakang A -> Z`. Lalu seperti itulah cara kerja enkripsi atbash kami.
 
 
+<img width="250" alt="image" src="https://user-images.githubusercontent.com/59334824/121806508-4aec2b00-cc7a-11eb-9d79-45f41c314b9c.png">
+<img width="545" alt="image" src="https://user-images.githubusercontent.com/59334824/121806427-0c567080-cc7a-11eb-9370-ccdeac0cf1e1.png">
+<img width="618" alt="image" src="https://user-images.githubusercontent.com/59334824/121806479-2f812000-cc7a-11eb-9ce5-e680dac624ae.png">
+
+
 ## N0 2
 Selain itu Sei mengusulkan untuk membuat metode enkripsi tambahan agar data pada
 komputer mereka semakin aman. Berikut rancangan metode enkripsi tambahan yang
@@ -398,6 +403,11 @@ Untuk mendapatkan nama baru dari file didalam direktori spesial, pertama-tama na
 Kemudian didapatkan nilai perbedaan dari nama awal dengan nama akhir, nilai ini adalah nilai desimal dari bilangan biner yang merepresentasikan ada atau tidaknya perbedaan dari nama awal dan nama akhir dari file, jika ada maka digit biner akan bernilai 1 dan jika tidak maka akan bernilai 0. Contohnya CoNToH.tXt akan menjadi contoh.tXT yang di representasikan menjadi 101101 yang jika diubah menjadi desimal akan bernilai 45.
 Setelah nilai perbedaan didapat, nama file akan dirubah menjadi lowecase, kemudian di concate dengan ekstensi dan nilai perbedaan yang didapatkan sebelumnya.
 
+<img width="244" alt="image" src="https://user-images.githubusercontent.com/59334824/121806672-fdbc8900-cc7a-11eb-8f65-b6477f755c48.png">
+
+![image](https://user-images.githubusercontent.com/59334824/121806676-04e39700-cc7b-11eb-9e41-b17f2a4cf119.png)
+
+
 ## NO4
 Untuk memudahkan dalam memonitor kegiatan pada filesystem mereka Sin dan Sei membuat sebuah log system dengan spesifikasi sebagai berikut.
 - Log system yang akan terbentuk bernama “SinSeiFS.log” pada direktori home pengguna (/home/[user]/SinSeiFS.log). Log system ini akan menyimpan daftar perintah system call yang telah dijalankan pada filesystem.
@@ -464,3 +474,6 @@ int log_warning_command(char *command, const char *from, const char *to)
 Jika terdapat tujuan logging, maka format logging  `:[Level]::[dd][mm][yyyy]-[HH]:[MM]:[SS]:[CMD]::[DESC :: DESC]` dengan kedua desc berisi `char* from` dan `char* to`. Jika terdapat tujuan logging `[Level]::[dd][mm][yyyy]-[HH]:[MM]:[SS]:[CMD]::[DESC]` dengan desc adalah `char* from`.
 
 Lalu print hasil perulangan dalam bentuk `string`. Buka fileouput lalu akan memasukan string main kedalam `log`.
+
+<img width="1394" alt="image" src="https://user-images.githubusercontent.com/59334824/121806538-70793480-cc7a-11eb-81f6-b9d1515daa67.png">
+
