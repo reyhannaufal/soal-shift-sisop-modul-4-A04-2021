@@ -104,3 +104,186 @@ char *encrypt_atbash(char *str)
 }
 ```
 Jika file tersebut merupakan file hidden maka akan diexclude dan akan langsung direturn. Lalu ASCII code kapital dimulai dari 65 - 90, sedangkan untuk ASCII code huruf kecil dimulai dari 97 - 122. Kami melakukan exclude untuk yang tidak memenuhi ASCII code yang telah dilakukan. Lalu kami akan mengurangi nya dengan ` output[i] = 'Z' + 'A' - str[i];` ` // 65 + 90 - 65 = 90 rubah ke belakang A -> Z`. Lalu seperti itulah cara kerja enkripsi atbash kami.
+
+
+## N0 2
+Selain itu Sei mengusulkan untuk membuat metode enkripsi tambahan agar data pada
+komputer mereka semakin aman. Berikut rancangan metode enkripsi tambahan yang
+dirancang oleh Sei. Karena no 02 perlu enkripsi ROT13 dan Vigenere. Maka membuat dlu kodingan enkripsinya.
+Algoritma Rot13. 
+```C
+char *encrypt_rot13(char *str)
+{
+    int i = 0;
+    if (str == NULL)
+    {
+        return NULL;
+    }
+    if (!strcmp(str, ".") || !strcmp(str, ".."))
+        return str;
+
+    char *result = malloc(strlen(str));
+    strcpy(result, str);
+    if (result != NULL)
+    {
+        while (str[i] != '\0')
+        {
+            if (str[i] == '.')
+            {
+                break;
+            }
+            //Only increment alphabet characters
+            if ((str[i] >= 97 && str[i] <= 122) || (str[i] >= 65 && str[i] <= 90))
+            {
+                if (str[i] > 109 || (str[i] > 77 && str[i] < 91))
+                {
+                    //Characters that wrap around to the start of the alphabet
+                    result[i] -= 13;
+                }
+                else
+                {
+                    //Characters that can be safely incremented
+                    result[i] += 13;
+                }
+            }
+            i++;
+        }
+        while (str[i] != '\0')
+        {
+            result[i] = str[i];
+            i++;
+        }
+    }
+    result[i] = '\0';
+    return result;
+}
+
+```
+Algoritma ini bekerja dengan cara membagi dua 26 huruf latin menjadi dua (13 pertama dan 13 terakhir). Lalu, merotasi huruf 13 pertama menjadi 13 terakhir dan sebaliknya. Sehingga A menjadi N, B menjadi O (dan sebaliknya), dan seterusnya.
+
+Algoritma enkripsi Vigenere.
+```C
+char KEY[] = "SISOP";
+
+char *encrypt_vignere(char *str)
+{
+    int i, j;
+    int msgLen = strlen(str);
+    int keyLen = strlen(KEY);
+    char newKey[msgLen];
+    char *encryptedMsg = malloc(msgLen);
+
+    if (!strcmp(str, ".") || !strcmp(str, ".."))
+        return str;
+    //generating new key
+    for (i = 0, j = 0; i < msgLen; ++i, ++j)
+    {
+        if (j == keyLen)
+            j = 0;
+
+        newKey[i] = KEY[j];
+    }
+
+    newKey[i] = '\0';
+
+    //encryption
+    for (i = 0; i < msgLen; ++i)
+    {
+        if (str[i] == '.')
+        {
+            break;
+        }
+        encryptedMsg[i] = ((str[i] + newKey[i]) % 26) + 'A';
+    }
+
+    while (str[i] != '\0')
+    {
+        encryptedMsg[i] = str[i];
+        i++;
+    }
+
+    encryptedMsg[i] = '\0';
+
+    return encryptedMsg;
+}
+```
+Algoritma ini bekerja dengan cara menggandakan keynya (dalam konteks ini "SISOP") menjadi sepanjang string yang akan dienkripsi (secara berulang, misal "SISOPSISOP..." sepanjang string). Setelah itu algoritma enkripsnya key[i] + string[i]/mod 26.
+
+Algoritma dekripsi Vigenere.
+```C
+char *decrypt_vignere(char *str)
+{
+    int i, j;
+    int msgLen = strlen(str);
+    int keyLen = strlen(KEY);
+    char newKey[msgLen];
+    char *decryptedMsg = malloc(msgLen);
+
+    if (!strcmp(str, ".") || !strcmp(str, ".."))
+        return str;
+
+    //generating new key
+    for (i = 0, j = 0; i < msgLen; ++i, ++j)
+    {
+        if (j == keyLen)
+            j = 0;
+
+        newKey[i] = KEY[j];
+    }
+
+    newKey[i] = '\0';
+
+    //decryption
+    for (i = 0; i < msgLen; ++i)
+    {
+        if (str[i] == '.')
+        {
+            break;
+        }
+        decryptedMsg[i] = (((str[i] - newKey[i]) + 26) % 26) + 'A';
+    }
+
+    while (str[i] != '\0')
+    {
+        decryptedMsg[i] = str[i];
+        i++;
+    }
+    decryptedMsg[i] = '\0';
+
+    return decryptedMsg;
+}
+
+```
+Algortima ini bekerja hampir mirip dengan enkripsinya tapi tinggal dibalik ajah. Dekripsi = (stringEnkripti[i] - key[i]) mod 26.
+
+No 2a. 
+Jika sebuah direktori dibuat dengan awalan “RX_[Nama]”, maka direktori
+tersebut akan menjadi direktori terencode beserta isinya dengan perubahan
+nama isi sesuai kasus nomor 1 dengan algoritma tambahan ROT13 (Atbash +
+ROT13).
+
+```C
+else if (enc & (1 << 1))
+        {
+            sprintf(temp, "/%s", encrypt_rot13(encrypt_atbash(de->d_name)));
+        }
+```
+Jika memenuhi seperti yang diminta oleh no 2a, yakni ada folder yang dibuat (mkdir) maka fungsi encryt_rot13(encrypti_atbash(string)) akan muncul.
+
+No 2b.
+Jika sebuah direktori di-rename dengan awalan “RX_[Nama]”, maka direktori
+tersebut akan menjadi direktori terencode beserta isinya dengan perubahan
+nama isi sesuai dengan kasus nomor 1 dengan algoritma tambahan Vigenere
+Cipher dengan key “SISOP” (Case-sensitive, Atbash + Vigenere).
+```C
+else if (enc & (1 << 2))
+        {
+            sprintf(temp, "/%s", encrypt_vignere(encrypt_atbash(de->d_name)));
+        }
+```
+Mirip dengan no 2a, jika ada rename dengan awalan "RX_" maka fungsi encrypt_vignere dan encrypt_atbash akan dipanggil dengan parameter string (yang akan dienkripsi).
+Kendala:
+No 2c, 2d, 2e belum bisa dikerjakan.
+referensi: 
+- https://en.wikipedia.org/wiki/ROT13
+- https://www.javatpoint.com/vigenere-cipher
