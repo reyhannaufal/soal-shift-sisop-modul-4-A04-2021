@@ -285,6 +285,118 @@ referensi:
 
 ## NO3
 
+Sin menambahkan fitur ke filesystem mereka dimana sebuah direktori dengan awalan "A_is_a" menjadi direktori spesial
+```sh
+int get_encryption_mode(char *path)
+{
+....
+    if (strstr(tok, "A_is_a_") == tok)
+        {
+            mode |= 1 << 3;
+        }
+....
+}
+
+char *get_encryption_path(const char *path)
+{
+....
+ else if (enc & (1 << 3))
+        {
+            // sprintf(fpath + n, "/%s", jawaban);
+            sprintf(fpath + n, "/%s", get_special_directory_name(jawaban));
+        }
+....
+}
+```
+Pada fungsi get_encryption_path, value enc didapat menggunakan fungsi get_encryption_mode.
+
+Setelah direktori menjadi direktori special, fungsi get_special_directory_name dijalankan untuk merubah nama file yang terdapat didalam direktori menjadi lowercase dan memberi ekstensi berupa angka yang menunjukan perbedaan nama file setelah dan sebelum dirubah menjadi lowecase
+```sh
+char *get_file_name_only(char *path)
+{
+    char *filename = malloc(sizeof(char) * buffer_size);
+    char *temppath = get_file_name(path);
+    int n = strlen(temppath);
+    int i = 0;
+    for (; i < n; i++)
+    {
+        if (temppath[i] == '.')
+        {
+            break;
+        }
+    }
+    snprintf(filename, i + 1, "%s", temppath);
+    free(temppath);
+    return filename;
+}
+
+char *get_extension_name(char *path)
+{
+    char *filename = malloc(sizeof(char) * buffer_size);
+    char *temppath = get_file_name(path);
+    int n = strlen(temppath);
+    int i = 0;
+    for (; i < n; i++)
+    {
+        if (temppath[i] == '.')
+        {
+            break;
+        }
+    }
+    i++;
+    sprintf(filename, "%s", temppath + i);
+    free(temppath);
+    return filename;
+}
+
+int get_lowercase_diff_decimal(char *path)
+{
+    int val = 0;
+
+    int n = strlen(path);
+    int k = n;
+
+    int i = 0;
+
+    for (; i < k; i++)
+    {
+        int diff = (path[i] == tolower(path[i]) ? 0 : 1);
+        val <<= 1;
+        val |= diff;
+    }
+
+    return val;
+}
+
+char *get_special_directory_name(char *path)
+{
+    char *filename = malloc(sizeof(char) * buffer_size);
+    char *filename_only = get_file_name_only(path);
+    char *extension_only = get_extension_name(path);
+
+    //printf("%s\n", filename_only);
+    //printf("%s\n", extension_only);
+
+    int diff = get_lowercase_diff_decimal(filename_only);
+
+    int i = 0;
+    int n = strlen(filename_only);
+    for (; i < n; i++)
+    {
+        filename_only[i] = tolower(filename_only[i]);
+    }
+
+    sprintf(filename, "%s.%s.%d", filename_only, extension_only, diff);
+
+    free(filename_only);
+    free(extension_only);
+
+    return filename;
+}
+```
+Untuk mendapatkan nama baru dari file didalam direktori spesial, pertama-tama nama file dan ekstensi dari file dipisahkan, sehingga nama file dapat dirubah tanpa memodifikasi nama ekstensi dari file tersebut. 
+Kemudian didapatkan nilai perbedaan dari nama awal dengan nama akhir, nilai ini adalah nilai desimal dari bilangan biner yang merepresentasikan ada atau tidaknya perbedaan dari nama awal dan nama akhir dari file, jika ada maka digit biner akan bernilai 1 dan jika tidak maka akan bernilai 0. Contohnya CoNToH.tXt akan menjadi contoh.tXT yang di representasikan menjadi 101101 yang jika diubah menjadi desimal akan bernilai 45.
+Setelah nilai perbedaan didapat, nama file akan dirubah menjadi lowecase, kemudian di concate dengan ekstensi dan nilai perbedaan yang didapatkan sebelumnya.
 
 ## NO4
 Untuk memudahkan dalam memonitor kegiatan pada filesystem mereka Sin dan Sei membuat sebuah log system dengan spesifikasi sebagai berikut.
