@@ -5,11 +5,6 @@
 - Muhamad Fikri Sunandar 05111940000135
 - Reyhan Naufal Rahman 05111940000171
 
-### Daftar isi
-1. [NO 1](#NO1)
-2. [NO 2](#NO2)
-3. [NO 3](#NO3)
-4. [NO 4](#NO4)
 
 ## N0 1
 Di suatu jurusan, terdapat admin lab baru yang super duper gabut, ia bernama Sin. Sin baru menjadi admin di lab tersebut selama 1 bulan. Selama sebulan tersebut ia bertemu orang-orang hebat di lab tersebut, salah satunya yaitu Sei. Sei dan Sin akhirnya berteman baik. Karena belakangan ini sedang ramai tentang kasus keamanan data, mereka berniat membuat filesystem dengan metode encode yang mutakhir. Berikut adalah filesystem rancangan Sin dan Sei :
@@ -287,3 +282,73 @@ No 2c, 2d, 2e belum bisa dikerjakan.
 referensi: 
 - https://en.wikipedia.org/wiki/ROT13
 - https://www.javatpoint.com/vigenere-cipher
+
+## NO3
+
+
+## NO4
+Untuk memudahkan dalam memonitor kegiatan pada filesystem mereka Sin dan Sei membuat sebuah log system dengan spesifikasi sebagai berikut.
+- Log system yang akan terbentuk bernama “SinSeiFS.log” pada direktori home pengguna (/home/[user]/SinSeiFS.log). Log system ini akan menyimpan daftar perintah system call yang telah dijalankan pada filesystem.
+- Karena Sin dan Sei suka kerapian maka log yang dibuat akan dibagi menjadi dua level, yaitu INFO dan WARNING.
+- Untuk log level WARNING, digunakan untuk mencatat syscall rmdir dan unlink.
+- Sisanya, akan dicatat pada level INFO.
+- Format untuk logging yaitu:
+`[Level]::[dd][mm][yyyy]-[HH]:[MM]:[SS]:[CMD]::[DESC :: DESC]`
+Level : Level logging, dd : 2 digit tanggal, mm : 2 digit bulan, yyyy : 4 digit tahun, HH : 2 digit jam (format 24 Jam),MM : 2 digit menit, SS : 2 digit detik, CMD : System Call yang terpanggil, DESC : informasi dan parameter tambahan
+
+`INFO::28052021-10:00:00:CREATE::/test.txt`
+
+`INFO::28052021-10:01:00:RENAME::/test.txt::/rename.txt`
+
+Kami membuat 2 log pada system yaitu `warning` dan `info` 
+
+```C
+int log_info_command(char *command, const char *from, const char *to)
+{
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char mains[1000];
+    if (to == NULL)
+    {
+        sprintf(mains, "INFO::%02d%02d%02d-%02d:%02d:%02d:%s::%s\n",
+                tm.tm_mday, tm.tm_mon + 1, 1900 + tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, command, from);
+    }
+    else
+    {
+        sprintf(mains, "INFO::%02d%02d%02d-%02d:%02d:%02d:%s::%s::%s\n",
+                tm.tm_mday, tm.tm_mon + 1, 1900 + tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, command, from, to);
+    }
+    printf("%s", mains);
+    FILE *foutput = fopen(log_path, "a");
+    fputs(mains, foutput);
+    fclose(foutput);
+    return 1;
+}
+```
+
+```C
+int log_warning_command(char *command, const char *from, const char *to)
+{
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char mains[1000];
+    if (to == NULL)
+    {
+        sprintf(mains, "WARNING::%02d%02d%02d-%02d:%02d:%02d:%s::%s\n",
+                tm.tm_mday, tm.tm_mon + 1, 1900 + tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, command, from);
+    }
+    else
+    {
+        sprintf(mains, "WARNING::%02d%02d%02d-%02d:%02d:%02d:%s::%s::%s\n",
+                tm.tm_mday, tm.tm_mon + 1, 1900 + tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, command, from, to);
+    }
+    printf("%s", mains);
+    FILE *foutput = fopen(log_path, "a");
+    fputs(mains, foutput);
+    fclose(foutput);
+    return 1;
+}
+```
+Jika terdapat tujuan logging, maka format logging  `:[Level]::[dd][mm][yyyy]-[HH]:[MM]:[SS]:[CMD]::[DESC :: DESC]` dengan kedua desc berisi `char* from` dan `char* to`. Jika terdapat tujuan logging `[Level]::[dd][mm][yyyy]-[HH]:[MM]:[SS]:[CMD]::[DESC]` dengan desc adalah `char* from`.
+
+Lalu print hasil perulangan dalam bentuk `string`. Buka fileouput lalu akan memasukan string main kedalam `log`.
